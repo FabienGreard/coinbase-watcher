@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Route, Switch, Link, Redirect } from 'react-router-dom';
 
+/* PRIVATE KEYS */
+
+import { keys } from './keys';
+
 /* ACTIONS */
 import { alertActions } from '../../_actions';
 
@@ -39,7 +43,13 @@ class App extends React.Component {
           <Route
             exact
             path="/"
-            component={props => <Coinbase {...props} publicKey="0000xxx" />}
+            component={props => (
+              <Coinbase
+                {...props}
+                apiKey={keys.apiKey}
+                apiSecret={keys.apiSecret}
+              />
+            )}
           />
           <Redirect to="/" />
         </Switch>
