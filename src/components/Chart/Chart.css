@@ -1,0 +1,39 @@
+:root {
+  --white: #ffffff;
+  --grey: #bdc3c7;
+  --black: #383838;
+  --blue-1: #D6EEFF;
+  --blue-2: #AADDFF;
+  --blue-3: #94D3FC;
+}
+
+.chart {
+  width: 300px;
+  height: 200px;
+}
+
+.grid {
+  stroke: var(--black);
+  stroke-dasharray: 5;
+  stroke-width: 1;
+}
+
+.graph-text {
+  fill: var(--grey);
+}
+
+.graph-point {
+  stroke: var(--white);
+  fill: var(--blue-3);
+  r: 4;
+  stroke-width: 2;
+}
+
+.graph-line {
+  stroke: var(--blue-3);
+  stroke-width: 5;
+}
+
+.graph-path {
+  fill: var(--blue-1);
+}

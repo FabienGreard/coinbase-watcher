@@ -4,17 +4,19 @@ import { connect } from 'react-redux';
 import { Route, Switch, Link, Redirect } from 'react-router-dom';
 
 /* PRIVATE KEYS */
-
-import { keys } from './keys';
+import { keys } from '../../keys';
 
 /* ACTIONS */
 import { alertActions } from '../../_actions';
+
+/* SERVICES */
+import { coinbaseService } from '../../_services';
 
 /* HELPERS */
 import { history } from '../../helpers';
 
 /* COMPONENTS */
-import { Alert, Coinbase } from '../../components';
+import { Alert, Coinbase, Chart } from '../../components';
 
 /* CSS */
 import './App.css';
@@ -34,6 +36,20 @@ class App extends React.Component {
     return (
       <div>
         <Alert alert={alert} />
+        <div className="chart-container">
+          <Chart
+            currencyPair="ETH-EUR"
+            apiMethod={coinbaseService.getSpotPrice}
+          />
+          <Chart
+            currencyPair="ETH-EUR"
+            apiMethod={coinbaseService.getSellPrice}
+          />
+          <Chart
+            currencyPair="ETH-EUR"
+            apiMethod={coinbaseService.getBuyPrice}
+          />
+        </div>
         <ul>
           <li>
             <Link to="/">Coinbase</Link>
@@ -43,7 +59,7 @@ class App extends React.Component {
           <Route
             exact
             path="/"
-            component={props => (
+            render={props => (
               <Coinbase
                 {...props}
                 apiKey={keys.apiKey}

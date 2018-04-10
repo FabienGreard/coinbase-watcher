@@ -24,10 +24,7 @@ class Coinbase extends Component {
   };
 
   render() {
-    const { client } = this.state;
-    // console.log(client);
-    // console.log(this.getAccounts(client));
-    return <p>{JSON.stringify(client)}</p>;
+    return <div />;
   }
 }
 
