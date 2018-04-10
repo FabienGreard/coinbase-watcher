@@ -15,15 +15,18 @@ class Coinbase extends Component {
 
   getAccounts = client => {
     client.getAccounts({}, (err, accounts) => {
-      for (const acct of accounts) {
-        console.log('my bal: ' + acct.balance.amount + ' for ' + acct.name);
+      if (!err) {
+        for (const acct of accounts) {
+          console.log('my bal: ' + acct.balance.amount + ' for ' + acct.name);
+        }
       }
     });
   };
 
   render() {
     const { client } = this.state;
-    this.getAccounts(client);
+    // console.log(client);
+    // console.log(this.getAccounts(client));
     return <p>{JSON.stringify(client)}</p>;
   }
 }
