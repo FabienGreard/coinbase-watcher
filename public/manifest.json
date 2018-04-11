@@ -1,6 +1,6 @@
 {
-  "short_name": "coinbase-watcher",
-  "name": "Coinbase-Watcher",
+  "short_name": "gdax-trading",
+  "name": "Gdax-Trading",
   "icons": [
     {
       "src": "favicon.ico",

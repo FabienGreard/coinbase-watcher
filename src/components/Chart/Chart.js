@@ -7,22 +7,19 @@ import './Chart.css';
 class Chart extends Component {
   constructor(props) {
     super(props);
-
-    const { step, width, height } = props;
     this.state = {
       interval: null,
-      origin: { x: width / step, y: 0 },
-      width: width,
-      height: height,
-      chart: [{ x: 0, y: 0, value: 0 }],
-      chartMock: [{ x: 0, y: 0, value: 0 }],
+      origin: { x: props.width / props.step, y: 0 },
+      width: props.width,
+      height: props.height,
+      chart: props.data,
       isError: false
     };
   }
 
   componentDidMount() {
     const interval = setInterval(
-      this.updateChartMock,
+      this.updateChart,
       this.props.stepSecond * 1000
     );
     this.setState({ interval });
@@ -32,26 +29,25 @@ class Chart extends Component {
     this.clearInterval(this.state.timer);
   }
 
-  updateChart = () => {
-    const { apiMethod, params } = this.props;
-    apiMethod(params)
-      .then(json => {
-        const value = json.data.amount;
-        this.update('chart', value);
-      })
-      .catch(e => {
-        this.setState({
-          isError: true
-        });
-      });
-  };
+  // updateChart = () => {
+  //   const { apiMethod, params } = this.props;
+  //   apiMethod(params)
+  //     .then(json => {
+  //       const value = json.data.amount;
+  //       this.update('chart', value);
+  //     })
+  //     .catch(e => {
+  //       this.setState({
+  //         isError: true
+  //       });
+  //     });
+  // };
 
-  updateChartMock = () => {
-    this.update('chartMock', Math.round(Math.random() * 1000));
+  updateChart = () => {
+    this.update('chart', Math.round(Math.random() * 1000));
   };
 
   update = (chart, value) => {
-    const { step } = this.props;
     this.setState(prevstate => ({
       isError: false,
       [chart]: [
@@ -59,7 +55,7 @@ class Chart extends Component {
         {
           x:
             prevstate[chart][prevstate[chart].length - 1].x +
-            prevstate.width / step,
+            prevstate.width / this.props.step,
           y: value,
           value: value
         }
@@ -67,7 +63,7 @@ class Chart extends Component {
       origin: {
         x:
           prevstate[chart][prevstate[chart].length - 1].x > prevstate.width
-            ? prevstate.origin.x + prevstate.width / step
+            ? prevstate.origin.x + prevstate.width / this.props.step
             : prevstate.origin.x,
         y: 0
       }
@@ -76,38 +72,31 @@ class Chart extends Component {
 
   newUpdateMethod = () => {};
 
-  getMinMax = coords => {
-    const maxMinArray = Object.values(coords).map(coord => coord.y);
-    const min = Math.floor(Math.min.apply(null, maxMinArray));
-    const max = Math.ceil(Math.max.apply(null, maxMinArray));
-
-    return { min: min, max: max };
-  };
-
-  getOrdinate = coords => {
-    const minMax = this.getMinMax(coords);
-    const arrayCoords = Object.values(coords).map(coord => coord.y);
-    const moy = Math.round(
-      arrayCoords.reduce((acc, coord) => acc + coord) / arrayCoords.length
-    );
-
-    return { min: minMax.min, moy: moy, max: minMax.max };
+  getUtils = coords => {
+    const array = Object.values(coords).map(coord => coord.y);
+    return {
+      array: array,
+      min: Math.floor(Math.min.apply(null, array)),
+      max: Math.ceil(Math.max.apply(null, array)),
+      moy: Math.round(array.reduce((acc, coord) => acc + coord) / array.length)
+    };
   };
 
   getCoordinates = (coords, height) => {
-    const minMax = this.getMinMax(coords);
+    const minMax = this.getUtils(coords);
     const yRatio = (minMax.max - minMax.min) / height;
 
-    return coords.map((coord, i) => {
-      const y = Math.round(height - coord.y / yRatio) | 0;
-      return { x: coord.x, y: y, value: coord.value };
-    });
+    return coords.map((coord, i) => ({
+      x: coord.x,
+      y: Math.round(height - coord.y / yRatio) | 0,
+      value: coord.value
+    }));
   };
 
   render() {
-    const { chart, chartMock, isError, origin, width, height } = this.state;
+    const { chart, origin, width, height, isError } = this.state;
     const {
-      apiMethod,
+      title,
       identification,
       step,
       showPoint,
@@ -120,29 +109,24 @@ class Chart extends Component {
       showOrdinate
     } = this.props;
 
-    const graph = chart[1]
-      ? this.getCoordinates(chart, height)
-      : this.getCoordinates(chartMock, height);
+    const graph = this.getCoordinates(chart, height);
 
-    const ordinateAxis = chart[1]
-      ? this.getOrdinate(chart)
-      : this.getOrdinate(chartMock);
+    const utils = this.getUtils(chart);
+    const ordinateAxis = { min: utils.min, moy: utils.moy, max: utils.max };
 
     const value = graph[graph.length - 1].value | 0;
 
     return (
       <div>
         <h1>
-          {apiMethod.name} : {value}
-          {identification}
+          {title} {value} {identification}
         </h1>
         <div
           className="chart-container"
           style={{
             gridTemplateColumns: 'auto ' + width / 2 + 'px ' + width / 2 + 'px',
             gridTemplateRows: height / 2 + 'px ' + height / 2 + 'px auto'
-          }}
-        >
+          }}>
           {!isError ? (
             <svg
               viewBox={origin.x + ' ' + origin.y + ' ' + width + ' ' + height}
@@ -150,8 +134,7 @@ class Chart extends Component {
               style={{
                 width: width,
                 height: height
-              }}
-            >
+              }}>
               {showPath &&
                 graph.map((coord, key) => (
                   <g className="graph" key={key}>
@@ -233,8 +216,7 @@ class Chart extends Component {
                       className="graph-text"
                       style={{ 'font-size': 12 + 4 / step }}
                       x={coord.x - width / step / 2}
-                      y={origin.y + height - 10}
-                    >
+                      y={origin.y + height - 10}>
                       {coord.value}
                     </text>
                   </g>
@@ -260,16 +242,30 @@ class Chart extends Component {
 }
 
 Chart.propTypes = {
-  apiMethod: PropTypes.func.isRequired,
-  params: PropTypes.string.isRequired
+  data: PropTypes.array.isRequired,
+  title: PropTypes.string,
+  identification: PropTypes.string,
+  step: PropTypes.number,
+  stepSecond: PropTypes.number,
+  width: PropTypes.number,
+  height: PropTypes.number,
+  showPoint: PropTypes.bool,
+  showCoord: PropTypes.bool,
+  showLine: PropTypes.bool,
+  showPath: PropTypes.bool,
+  showXGrid: PropTypes.bool,
+  showYGrid: PropTypes.bool,
+  showAbscissa: PropTypes.bool,
+  showOrdinate: PropTypes.bool
 };
 
 Chart.defaultProps = {
+  title: '',
+  identification: '',
   step: 20,
   stepSecond: 1,
   width: 600,
   height: 400,
-  identification: '€',
   showPoint: true,
   showCoord: false,
   showLine: true,

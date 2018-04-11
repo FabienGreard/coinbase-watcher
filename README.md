@@ -1,8 +1,8 @@
-# Coinbase-Watcher [![Build Status](https://travis-ci.org/FabienGreard/coinbase-watcher.svg?branch=master)](https://travis-ci.org/FabienGreard/coinbase-watcher)[![dependencies Status](https://david-dm.org/FabienGreard/coinbase-watcher/status.svg)](https://david-dm.org/FabienGreard/coinbase-watcher)[![devDependencies Status](https://david-dm.org/FabienGreard/coinbase-watcher/dev-status.svg)](https://david-dm.org/FabienGreard/coinbase-watcher?type=dev)
+# Gdax-Trading [![Build Status](https://travis-ci.org/FabienGreard/gdax-trading.svg?branch=master)](https://travis-ci.org/FabienGreard/gdax-trading)[![dependencies Status](https://david-dm.org/FabienGreard/gdax-trading/status.svg)](https://david-dm.org/FabienGreard/gdax-trading)[![devDependencies Status](https://david-dm.org/FabienGreard/gdax-trading/dev-status.svg)](https://david-dm.org/FabienGreard/gdax-trading?type=dev)
 
-Coinbase-Watcher is a tool for managing your coinbase account
+Gdax-Trading is a tool for managing your gdax account
 
-If something doesn’t work, please [file an issue](https://github.com/FabienGreard/coinbase-watcher/issues/new).
+If something doesn’t work, please [file an issue](https://github.com/FabienGreard/gdax-trading/issues/new).
 
 ## Quick Start
 
@@ -11,6 +11,6 @@ npm install
 npm start
 ```
 
-Then open [http://localhost:3000/](http://localhost:3000/) to start using coinbase-watcher
+Then open [http://localhost:3000/](http://localhost:3000/) to start using gdax-trading
 
 When you’re ready to deploy to production, create a minified bundle with `npm run build`

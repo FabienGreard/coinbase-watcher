@@ -1,1 +1,1 @@
-export * from './coinbase.service';
+export * from './gdaxPublicApi.service';

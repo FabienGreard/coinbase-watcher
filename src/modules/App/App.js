@@ -10,13 +10,13 @@ import { keys } from '../../keys';
 import { alertActions } from '../../_actions';
 
 /* SERVICES */
-import { coinbaseService } from '../../_services';
+// import { gdaxService } from '../../_services';
 
 /* HELPERS */
 import { history } from '../../helpers';
 
 /* COMPONENTS */
-import { Alert, Coinbase, Chart } from '../../components';
+import { Alert, Chart, Gdax } from '../../components';
 
 /* CSS */
 import './App.css';
@@ -37,13 +37,11 @@ class App extends React.Component {
       <div>
         <Alert alert={alert} />
         <div className="charts">
-          <Chart params="ETH-EUR" apiMethod={coinbaseService.getSpotPrice} />
-          <Chart params="ETH-EUR" apiMethod={coinbaseService.getSellPrice} />
-          <Chart params="ETH-EUR" apiMethod={coinbaseService.getBuyPrice} />
+          <Chart title={'Line chart'} data={[{ x: 0, y: 0, value: 0 }]} />
         </div>
         <ul>
           <li>
-            <Link to="/">Coinbase</Link>
+            <Link to="/">Gdax</Link>
           </li>
         </ul>
         <Switch>
@@ -51,7 +49,7 @@ class App extends React.Component {
             exact
             path="/"
             render={props => (
-              <Coinbase
+              <Gdax
                 {...props}
                 apiKey={keys.apiKey}
                 apiSecret={keys.apiSecret}

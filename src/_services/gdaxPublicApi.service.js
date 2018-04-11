@@ -1,4 +1,9 @@
 import { url } from '../helpers';
+import Gdax from 'gdax';
+
+const getPublicClient = (productID = 'BTC-USD', endpoint = url.liveRest) => {
+  return new Gdax.PublicClient(productID, endpoint);
+};
 
 const getSellPrice = async currency => {
   const requestOptions = {
@@ -42,7 +47,7 @@ const getSpotPrice = async currency => {
   return response.json();
 };
 
-export const coinbaseService = {
+export const gdaxService = {
   getSellPrice,
   getBuyPrice,
   getSpotPrice
