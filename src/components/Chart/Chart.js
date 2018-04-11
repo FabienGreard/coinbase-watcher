@@ -11,11 +11,11 @@ class Chart extends Component {
     const { step, width, height } = props;
     this.state = {
       interval: null,
-      origin: { x: step + 2, y: 0 },
+      origin: { x: step, y: 0 },
       width: width,
       height: height,
-      chart: [{ x: step, y: 0, value: 0 }],
-      chartMock: [{ x: step, y: 0, value: 0 }],
+      chart: [{ x: 0, y: 0, value: 0 }],
+      chartMock: [{ x: 0, y: 0, value: 0 }],
       isError: false
     };
   }
@@ -47,7 +47,7 @@ class Chart extends Component {
   };
 
   updateChartMock = () => {
-    this.update('chartMock', Math.round(Math.random() * 100));
+    this.update('chartMock', Math.round(Math.random() * 1000));
   };
 
   update = (chart, value) => {
