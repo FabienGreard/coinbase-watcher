@@ -3,9 +3,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Route, Switch, Link, Redirect } from 'react-router-dom';
 
-/* PRIVATE KEYS */
-import { keys } from '../../keys';
-
 /* ACTIONS */
 import { alertActions } from '../../_actions';
 
@@ -13,7 +10,7 @@ import { alertActions } from '../../_actions';
 // import { gdaxService } from '../../_services';
 
 /* HELPERS */
-import { history } from '../../helpers';
+import { history, keys } from '../../helpers';
 
 /* COMPONENTS */
 import { Alert, Chart, Gdax } from '../../components';

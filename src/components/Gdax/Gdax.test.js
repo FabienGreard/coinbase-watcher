@@ -3,8 +3,8 @@ import { shallow } from 'enzyme';
 
 import { Gdax } from './Gdax';
 
-/* PRIVATE KEYS */
-import { keys } from '../../keys';
+/* HELPERS */
+import { keys } from '../../helpers';
 
 it('renders Coinbase without crashing', () => {
   if (!keys) {
