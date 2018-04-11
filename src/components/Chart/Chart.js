@@ -11,7 +11,7 @@ class Chart extends Component {
     const { step, width, height } = props;
     this.state = {
       interval: null,
-      origin: { x: step, y: 0 },
+      origin: { x: width / step, y: 0 },
       width: width,
       height: height,
       chart: [{ x: 0, y: 0, value: 0 }],
@@ -74,12 +74,30 @@ class Chart extends Component {
     }));
   };
 
-  getCoordinates = (coords, width, height) => {
+  newUpdateMethod = () => {};
+
+  getMinMax = coords => {
     const maxMinArray = Object.values(coords).map(coord => coord.y);
     const min = Math.floor(Math.min.apply(null, maxMinArray));
     const max = Math.ceil(Math.max.apply(null, maxMinArray));
 
-    const yRatio = (max - min) / height;
+    return { min: min, max: max };
+  };
+
+  getOrdinate = coords => {
+    const minMax = this.getMinMax(coords);
+    const arrayCoords = Object.values(coords).map(coord => coord.y);
+    const moy = Math.round(
+      arrayCoords.reduce((acc, coord) => acc + coord) / arrayCoords.length
+    );
+
+    return { min: minMax.min, moy: moy, max: minMax.max };
+  };
+
+  getCoordinates = (coords, height) => {
+    const minMax = this.getMinMax(coords);
+    const yRatio = (minMax.max - minMax.min) / height;
+
     return coords.map((coord, i) => {
       const y = Math.round(height - coord.y / yRatio) | 0;
       return { x: coord.x, y: y, value: coord.value };
@@ -103,8 +121,12 @@ class Chart extends Component {
     } = this.props;
 
     const graph = chart[1]
-      ? this.getCoordinates(chart, width, height)
-      : this.getCoordinates(chartMock, width, height);
+      ? this.getCoordinates(chart, height)
+      : this.getCoordinates(chartMock, height);
+
+    const ordinateAxis = chart[1]
+      ? this.getOrdinate(chart)
+      : this.getOrdinate(chartMock);
 
     const value = graph[graph.length - 1].value | 0;
 
@@ -114,11 +136,21 @@ class Chart extends Component {
           {apiMethod.name} : {value}
           {identification}
         </h1>
-        <div className="chart-grid">
+        <div
+          className="chart-container"
+          style={{
+            gridTemplateColumns: 'auto ' + width / 2 + 'px ' + width / 2 + 'px',
+            gridTemplateRows: height / 2 + 'px ' + height / 2 + 'px auto'
+          }}
+        >
           {!isError ? (
             <svg
               viewBox={origin.x + ' ' + origin.y + ' ' + width + ' ' + height}
               className="chart"
+              style={{
+                width: width,
+                height: height
+              }}
             >
               {showPath &&
                 graph.map((coord, key) => (
@@ -211,8 +243,16 @@ class Chart extends Component {
           ) : (
             <h1>Error</h1>
           )}
-          {showAbscissa && <div className="abscissa">abscissa</div>}
-          {showOrdinate && <div className="ordinate">ordinate</div>}
+          {showAbscissa && <div className="abscissa" />}
+          {showOrdinate && (
+            <div className="ordinate">
+              {Object.values(ordinateAxis).map((ordinate, index) => (
+                <span className="ordinate-span" key={index}>
+                  {ordinate} {identification}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -227,8 +267,8 @@ Chart.propTypes = {
 Chart.defaultProps = {
   step: 20,
   stepSecond: 1,
-  width: 300,
-  height: 200,
+  width: 600,
+  height: 400,
   identification: '€',
   showPoint: true,
   showCoord: false,
