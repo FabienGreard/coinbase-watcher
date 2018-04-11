@@ -15,12 +15,19 @@
 
 .chart-container {
   display: grid;
-  grid-gap: 2;
+  grid-gap: 0px 2px;
 }
 
 .abscissa {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
   grid-column: 2 / span 2;
   grid-row: 3;
+}
+
+.abscissa-span {
+  color: var(--black);
 }
 
 .ordinate {
@@ -32,8 +39,6 @@
 }
 
 .ordinate-span {
-  white-space: nowrap;
-  padding-right: 4px;
   color: var(--black);
 }
 

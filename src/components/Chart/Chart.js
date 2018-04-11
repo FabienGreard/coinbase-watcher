@@ -29,22 +29,8 @@ class Chart extends Component {
     this.clearInterval(this.state.timer);
   }
 
-  // updateChart = () => {
-  //   const { apiMethod, params } = this.props;
-  //   apiMethod(params)
-  //     .then(json => {
-  //       const value = json.data.amount;
-  //       this.update('chart', value);
-  //     })
-  //     .catch(e => {
-  //       this.setState({
-  //         isError: true
-  //       });
-  //     });
-  // };
-
   updateChart = () => {
-    this.update('chart', Math.round(Math.random() * 1000));
+    this.newUpdateMethod('chart', Math.round(Math.random() * 1000));
   };
 
   update = (chart, value) => {
@@ -70,7 +56,34 @@ class Chart extends Component {
     }));
   };
 
-  newUpdateMethod = () => {};
+  newUpdateMethod = (chart, value) => {
+    if (this.state[chart].length - 1 > this.props.step) {
+      this.state[chart] = this.state[chart]
+        .map((val, i) => this.state[chart][i + 1])
+        .filter(x => x);
+    }
+
+    this.setState(prevstate => ({
+      isError: false,
+      [chart]: [
+        ...prevstate[chart],
+        {
+          x:
+            prevstate[chart][prevstate[chart].length - 1].x +
+            prevstate.width / this.props.step,
+          y: value,
+          value: value
+        }
+      ],
+      origin: {
+        x:
+          prevstate[chart][prevstate[chart].length - 1].x > prevstate.width
+            ? prevstate.origin.x + prevstate.width / this.props.step
+            : prevstate.origin.x,
+        y: 0
+      }
+    }));
+  };
 
   getUtils = coords => {
     const array = Object.values(coords).map(coord => coord.y);
@@ -84,7 +97,7 @@ class Chart extends Component {
 
   getCoordinates = (coords, height) => {
     const minMax = this.getUtils(coords);
-    const yRatio = (minMax.max - minMax.min) / height;
+    const yRatio = (minMax.max * 1.01 - minMax.min) / height;
 
     return coords.map((coord, i) => ({
       x: coord.x,
@@ -99,6 +112,7 @@ class Chart extends Component {
       title,
       identification,
       step,
+      stepSecond,
       showPoint,
       showPath,
       showCoord,
@@ -115,6 +129,7 @@ class Chart extends Component {
     const ordinateAxis = { min: utils.min, moy: utils.moy, max: utils.max };
 
     const value = graph[graph.length - 1].value | 0;
+    const date = new Date();
 
     return (
       <div>
@@ -124,8 +139,8 @@ class Chart extends Component {
         <div
           className="chart-container"
           style={{
-            gridTemplateColumns: 'auto ' + width / 2 + 'px ' + width / 2 + 'px',
-            gridTemplateRows: height / 2 + 'px ' + height / 2 + 'px auto'
+            gridTemplateColumns: 'auto ' + width + 'px ',
+            gridTemplateRows: height + 'px auto'
           }}>
           {!isError ? (
             <svg
@@ -225,7 +240,28 @@ class Chart extends Component {
           ) : (
             <h1>Error</h1>
           )}
-          {showAbscissa && <div className="abscissa" />}
+          {showAbscissa && (
+            <div
+              className="abscissa"
+              style={{
+                width: Math.floor(graph.length * (width / step)),
+                maxWidth: width
+              }}>
+              {Array.from(
+                Array(Math.floor(graph.length * (width / step) / 100)),
+                (v, i) =>
+                  (i + 1) * Math.floor(graph.length * (width / step) / 100)
+              ).map((value, i) => (
+                <span className="abscissa-span" key={i}>
+                  {new Date(
+                    date.getTime() - value * stepSecond * 1000
+                  ).getHours()}:{new Date(
+                    date.getTime() - value * stepSecond * 1000
+                  ).getMinutes()}
+                </span>
+              ))}
+            </div>
+          )}
           {showOrdinate && (
             <div className="ordinate">
               {Object.values(ordinateAxis).map((ordinate, index) => (
@@ -242,7 +278,7 @@ class Chart extends Component {
 }
 
 Chart.propTypes = {
-  data: PropTypes.array.isRequired,
+  data: PropTypes.array,
   title: PropTypes.string,
   identification: PropTypes.string,
   step: PropTypes.number,
@@ -260,9 +296,10 @@ Chart.propTypes = {
 };
 
 Chart.defaultProps = {
+  data: [{ x: 0, y: 0, value: 0 }],
   title: '',
   identification: '',
-  step: 20,
+  step: 60,
   stepSecond: 1,
   width: 600,
   height: 400,
