@@ -36,19 +36,10 @@ class App extends React.Component {
     return (
       <div>
         <Alert alert={alert} />
-        <div className="chart-container">
-          <Chart
-            currencyPair="ETH-EUR"
-            apiMethod={coinbaseService.getSpotPrice}
-          />
-          <Chart
-            currencyPair="ETH-EUR"
-            apiMethod={coinbaseService.getSellPrice}
-          />
-          <Chart
-            currencyPair="ETH-EUR"
-            apiMethod={coinbaseService.getBuyPrice}
-          />
+        <div className="charts">
+          <Chart params="ETH-EUR" apiMethod={coinbaseService.getSpotPrice} />
+          <Chart params="ETH-EUR" apiMethod={coinbaseService.getSellPrice} />
+          <Chart params="ETH-EUR" apiMethod={coinbaseService.getBuyPrice} />
         </div>
         <ul>
           <li>

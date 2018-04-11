@@ -4,5 +4,5 @@ import { shallow } from 'enzyme';
 import { Chart } from './Chart';
 
 it('renders Chart without crashing', () => {
-  shallow(<Chart />);
+  shallow(<Chart apiMethod={() => {}} params="" />);
 });

@@ -1,10 +1,27 @@
 :root {
-  --white: #ffffff;
+  --white: #f7efef;
   --grey: #bdc3c7;
   --black: #383838;
-  --blue-1: #D6EEFF;
-  --blue-2: #AADDFF;
-  --blue-3: #94D3FC;
+  --gradiant-red-1: #ff8989;
+  --gradiant-red-2: #a81717;
+  --gradiant-red-3: #961010;
+  --gradiant-green-1: #cff7d5;
+  --gradiant-green-2: #17a82a;
+  --gradiant-green-3: #109619;
+  --gradiant-1: #afe9ff;
+  --gradiant-2: #52b1d3;
+  --gradiant-3: #3eb5e0;
+}
+
+.chart-container {
+}
+
+.abscissa {
+  background-color: var(--white);
+}
+
+.ordinate {
+  background-color: var(--white);
 }
 
 .chart {
@@ -19,21 +36,27 @@
 }
 
 .graph-text {
-  fill: var(--grey);
+  fill: var(--black);
+  text-anchor: middle;
 }
 
 .graph-point {
   stroke: var(--white);
-  fill: var(--blue-3);
+  fill: var(--gradiant-3);
   r: 4;
   stroke-width: 2;
 }
 
 .graph-line {
-  stroke: var(--blue-3);
+  stroke: var(--gradiant-3);
   stroke-width: 5;
 }
 
 .graph-path {
-  fill: var(--blue-1);
+  fill: var(--gradiant-1);
+}
+
+.graph-path:hover {
+  cursor: pointer;
+  fill: var(--gradiant-2);
 }
