@@ -57,12 +57,13 @@ class Chart extends Component {
   };
 
   newUpdateMethod = (chart, value) => {
-    if (this.state[chart].length - 1 > this.props.step) {
-      this.state[chart] = this.state[chart]
-        .map((val, i) => this.state[chart][i + 1])
-        .filter(x => x);
+    if (this.state[chart].length > this.props.step) {
+      this.setState(prevstate => ({
+        [chart]: prevstate[chart]
+          .map((val, i) => prevstate[chart][i + 1])
+          .filter(x => x)
+      }));
     }
-
     this.setState(prevstate => ({
       isError: false,
       [chart]: [
@@ -97,7 +98,7 @@ class Chart extends Component {
 
   getCoordinates = (coords, height) => {
     const minMax = this.getUtils(coords);
-    const yRatio = (minMax.max * 1.01 - minMax.min) / height;
+    const yRatio = (minMax.max * 1.01 - minMax.min * 0.99) / height;
 
     return coords.map((coord, i) => ({
       x: coord.x,
@@ -244,13 +245,16 @@ class Chart extends Component {
             <div
               className="abscissa"
               style={{
-                width: Math.floor(graph.length * (width / step)),
-                maxWidth: width
+                width: Math.floor(
+                  (graph.length - 2 < 0
+                    ? 0
+                    : graph.length + 2 > step ? graph.length - 1 : -2) *
+                    (width / step)
+                )
               }}>
               {Array.from(
-                Array(Math.floor(graph.length * (width / step) / 100)),
-                (v, i) =>
-                  (i + 1) * Math.floor(graph.length * (width / step) / 100)
+                Array(Math.floor((graph.length - 1) * (width / step) / 100)),
+                (v, i) => i * (step / width) * 100
               ).map((value, i) => (
                 <span className="abscissa-span" key={i}>
                   {new Date(
@@ -299,7 +303,7 @@ Chart.defaultProps = {
   data: [{ x: 0, y: 0, value: 0 }],
   title: '',
   identification: '',
-  step: 60,
+  step: 10,
   stepSecond: 1,
   width: 600,
   height: 400,
