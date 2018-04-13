@@ -9,20 +9,18 @@ class Chart extends Component {
     super(props);
     this.state = {
       interval: null,
-      origin: { x: props.width / props.step, y: 0 },
+      utils: this.getUtils(props.data, null),
       width: props.width,
       height: props.height,
       chart: props.data,
-      isError: false
+      origin: { x: props.width / props.step, y: 0 }
     };
   }
 
   componentDidMount() {
-    const interval = setInterval(
-      this.updateChart,
-      this.props.stepSecond * 1000
-    );
-    this.setState({ interval });
+    this.setState({
+      interval: setInterval(this.updateChart, this.props.stepSecond * 1000)
+    });
   }
 
   componentWillUnmount() {
@@ -30,33 +28,10 @@ class Chart extends Component {
   }
 
   updateChart = () => {
-    this.newUpdateMethod('chart', Math.round(Math.random() * 1000));
+    this.update('chart', Math.round(Math.random() * 5000));
   };
 
   update = (chart, value) => {
-    this.setState(prevstate => ({
-      isError: false,
-      [chart]: [
-        ...prevstate[chart],
-        {
-          x:
-            prevstate[chart][prevstate[chart].length - 1].x +
-            prevstate.width / this.props.step,
-          y: value,
-          value: value
-        }
-      ],
-      origin: {
-        x:
-          prevstate[chart][prevstate[chart].length - 1].x > prevstate.width
-            ? prevstate.origin.x + prevstate.width / this.props.step
-            : prevstate.origin.x,
-        y: 0
-      }
-    }));
-  };
-
-  newUpdateMethod = (chart, value) => {
     if (this.state[chart].length > this.props.step) {
       this.setState(prevstate => ({
         [chart]: prevstate[chart]
@@ -65,7 +40,6 @@ class Chart extends Component {
       }));
     }
     this.setState(prevstate => ({
-      isError: false,
       [chart]: [
         ...prevstate[chart],
         {
@@ -82,23 +56,29 @@ class Chart extends Component {
             ? prevstate.origin.x + prevstate.width / this.props.step
             : prevstate.origin.x,
         y: 0
-      }
+      },
+      utils: this.getUtils(prevstate[chart], prevstate.utils)
     }));
   };
 
-  getUtils = coords => {
+  getUtils = (coords, utils) => {
     const array = Object.values(coords).map(coord => coord.y);
     return {
-      array: array,
-      min: Math.floor(Math.min.apply(null, array)),
-      max: Math.ceil(Math.max.apply(null, array)),
-      moy: Math.round(array.reduce((acc, coord) => acc + coord) / array.length)
+      min:
+        utils && utils.min < Math.floor(Math.min.apply(null, array))
+          ? utils.min
+          : Math.floor(Math.min.apply(null, array)),
+      max:
+        utils && utils.max > Math.ceil(Math.max.apply(null, array))
+          ? utils.max
+          : Math.ceil(Math.max.apply(null, array)),
+      moy: utils ? Math.round(utils.min + utils.max / 2) : 0
     };
   };
 
-  getCoordinates = (coords, height) => {
-    const minMax = this.getUtils(coords);
-    const yRatio = (minMax.max * 1.01 - minMax.min * 0.99) / height;
+  getCoordinates = (coords, height, utils) => {
+    getUtils(utils);
+    const yRatio = (utils.max * 1.01 - utils.min * 0.99) / height;
 
     return coords.map((coord, i) => ({
       x: coord.x,
@@ -108,7 +88,7 @@ class Chart extends Component {
   };
 
   render() {
-    const { chart, origin, width, height, isError } = this.state;
+    const { chart, origin, width, height, utils } = this.state;
     const {
       title,
       identification,
@@ -124,9 +104,7 @@ class Chart extends Component {
       showOrdinate
     } = this.props;
 
-    const graph = this.getCoordinates(chart, height);
-
-    const utils = this.getUtils(chart);
+    const graph = this.getCoordinates(chart, height, utils);
     const ordinateAxis = { min: utils.min, moy: utils.moy, max: utils.max };
 
     const value = graph[graph.length - 1].value | 0;
@@ -143,125 +121,118 @@ class Chart extends Component {
             gridTemplateColumns: 'auto ' + width + 'px ',
             gridTemplateRows: height + 'px auto'
           }}>
-          {!isError ? (
-            <svg
-              viewBox={origin.x + ' ' + origin.y + ' ' + width + ' ' + height}
-              className="chart"
-              style={{
-                width: width,
-                height: height
-              }}>
-              {showPath &&
-                graph.map((coord, key) => (
-                  <g className="graph" key={key}>
-                    <path
-                      className="graph-path"
-                      d={
-                        'M' +
-                        graph[key - 1 >= 0 ? key - 1 : key].x +
-                        ' ' +
-                        graph[key - 1 >= 0 ? key - 1 : key].y +
-                        ', L' +
-                        graph[key - 1 >= 0 ? key - 1 : key].x +
-                        ' ' +
-                        (origin.y + height) +
-                        ', L' +
-                        coord.x +
-                        ' ' +
-                        (origin.y + height) +
-                        ', L' +
-                        coord.x +
-                        ' ' +
-                        coord.y +
-                        ' Z'
-                      }
-                    />
-                  </g>
-                ))}
-              {showXGrid && (
-                <g className="grid">
-                  <line
-                    className="x-grid"
-                    x1={origin.x}
-                    y1={origin.y}
-                    x2={origin.x}
-                    y2={origin.y + height}
+          <svg
+            viewBox={origin.x + ' ' + origin.y + ' ' + width + ' ' + height}
+            className="chart"
+            style={{
+              width: width,
+              height: height
+            }}>
+            {showPath &&
+              graph.map((coord, key) => (
+                <g className="graph" key={key}>
+                  <path
+                    className="graph-path"
+                    d={
+                      'M' +
+                      graph[key - 1 >= 0 ? key - 1 : key].x +
+                      ' ' +
+                      graph[key - 1 >= 0 ? key - 1 : key].y +
+                      ', L' +
+                      graph[key - 1 >= 0 ? key - 1 : key].x +
+                      ' ' +
+                      (origin.y + height) +
+                      ', L' +
+                      coord.x +
+                      ' ' +
+                      (origin.y + height) +
+                      ', L' +
+                      coord.x +
+                      ' ' +
+                      coord.y +
+                      ' Z'
+                    }
                   />
                 </g>
-              )}
-              {showYGrid && (
-                <g className="grid">
+              ))}
+            {showXGrid && (
+              <g className="grid">
+                <line
+                  className="x-grid"
+                  x1={origin.x}
+                  y1={origin.y}
+                  x2={origin.x}
+                  y2={origin.y + height}
+                />
+              </g>
+            )}
+            {showYGrid && (
+              <g className="grid">
+                <line
+                  className="y-grid"
+                  x1={origin.x}
+                  y1={origin.y + height}
+                  x2={origin.x + width}
+                  y2={origin.y + height}
+                />
+              </g>
+            )}
+            {showLine &&
+              graph.map((coord, key) => (
+                <g className="graph" key={key}>
                   <line
-                    className="y-grid"
-                    x1={origin.x}
-                    y1={origin.y + height}
-                    x2={origin.x + width}
-                    y2={origin.y + height}
+                    className="graph-line"
+                    style={{ strokeWidth: 2 + 5 / step }}
+                    x1={graph[key - 1 >= 0 ? key - 1 : key].x}
+                    y1={graph[key - 1 >= 0 ? key - 1 : key].y}
+                    x2={coord.x}
+                    y2={coord.y}
                   />
                 </g>
-              )}
-              {showLine &&
-                graph.map((coord, key) => (
-                  <g className="graph" key={key}>
-                    <line
-                      className="graph-line"
-                      style={{ strokeWidth: 2 + 5 / step }}
-                      x1={graph[key - 1 >= 0 ? key - 1 : key].x}
-                      y1={graph[key - 1 >= 0 ? key - 1 : key].y}
-                      x2={coord.x}
-                      y2={coord.y}
-                    />
-                  </g>
-                ))}
-              {showPoint &&
-                graph.map((coord, key) => (
-                  <g className="graph" key={key}>
-                    <circle
-                      className="graph-point"
-                      style={{ r: 1 + 5 / step }}
-                      cx={coord.x}
-                      cy={coord.y}
-                      data-value={coord.x}
-                    />
-                  </g>
-                ))}
-              {showCoord &&
-                graph.map((coord, key) => (
-                  <g className="graph" key={key}>
-                    <text
-                      className="graph-text"
-                      style={{ 'font-size': 12 + 4 / step }}
-                      x={coord.x - width / step / 2}
-                      y={origin.y + height - 10}>
-                      {coord.value}
-                    </text>
-                  </g>
-                ))}
-            </svg>
-          ) : (
-            <h1>Error</h1>
-          )}
+              ))}
+            {showPoint &&
+              graph.map((coord, key) => (
+                <g className="graph" key={key}>
+                  <circle
+                    className="graph-point"
+                    style={{ r: 1 + 5 / step }}
+                    cx={coord.x}
+                    cy={coord.y}
+                    data-value={coord.x}
+                  />
+                </g>
+              ))}
+            {showCoord &&
+              graph.map((coord, key) => (
+                <g className="graph" key={key}>
+                  <text
+                    className="graph-text"
+                    style={{ 'font-size': 12 + 4 / step }}
+                    x={coord.x - width / step / 2}
+                    y={origin.y + height - 10}>
+                    {coord.value}
+                  </text>
+                </g>
+              ))}
+          </svg>
+
           {showAbscissa && (
             <div
               className="abscissa"
               style={{
-                width: Math.floor(
-                  (graph.length - 2 < 0
-                    ? 0
-                    : graph.length + 2 > step ? graph.length - 1 : -2) *
-                    (width / step)
-                )
+                width: graph.length - 1 * width / step
               }}>
               {Array.from(
                 Array(Math.floor((graph.length - 1) * (width / step) / 100)),
                 (v, i) => i * (step / width) * 100
               ).map((value, i) => (
                 <span className="abscissa-span" key={i}>
-                  {new Date(
+                  {/* {new Date(
                     date.getTime() - value * stepSecond * 1000
                   ).getHours()}:{new Date(
                     date.getTime() - value * stepSecond * 1000
-                  ).getMinutes()}
+                  ).getMinutes()} */}
+                  {graph.length} {step}
                 </span>
               ))}
             </div>
@@ -303,7 +274,7 @@ Chart.defaultProps = {
   data: [{ x: 0, y: 0, value: 0 }],
   title: '',
   identification: '',
-  step: 10,
+  step: 6,
   stepSecond: 1,
   width: 600,
   height: 400,
