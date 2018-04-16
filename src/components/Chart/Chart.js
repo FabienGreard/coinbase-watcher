@@ -77,7 +77,7 @@ class Chart extends Component {
   };
 
   getCoordinates = (coords, height, utils) => {
-    getUtils(utils);
+    this.getUtils(utils);
     const yRatio = (utils.max * 1.01 - utils.min * 0.99) / height;
 
     return coords.map((coord, i) => ({
@@ -105,6 +105,7 @@ class Chart extends Component {
     } = this.props;
 
     const graph = this.getCoordinates(chart, height, utils);
+    console.log(graph);
     const ordinateAxis = { min: utils.min, moy: utils.moy, max: utils.max };
 
     const value = graph[graph.length - 1].value | 0;
@@ -220,19 +221,21 @@ class Chart extends Component {
             <div
               className="abscissa"
               style={{
-                width: graph.length - 1 * width / step
+                width:
+                  (graph.length > step ? graph.length - 1 : graph.length - 2) *
+                  width /
+                  step
               }}>
               {Array.from(
                 Array(Math.floor((graph.length - 1) * (width / step) / 100)),
                 (v, i) => i * (step / width) * 100
               ).map((value, i) => (
                 <span className="abscissa-span" key={i}>
-                  {/* {new Date(
+                  {new Date(
                     date.getTime() - value * stepSecond * 1000
                   ).getHours()}:{new Date(
                     date.getTime() - value * stepSecond * 1000
-                  ).getMinutes()} */}
-                  {graph.length} {step}
+                  ).getMinutes()}
                 </span>
               ))}
             </div>
@@ -274,7 +277,7 @@ Chart.defaultProps = {
   data: [{ x: 0, y: 0, value: 0 }],
   title: '',
   identification: '',
-  step: 6,
+  step: 3,
   stepSecond: 1,
   width: 600,
   height: 400,
