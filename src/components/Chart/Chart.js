@@ -57,7 +57,19 @@ class Chart extends Component {
             : prevstate.origin.x,
         y: 0
       },
-      utils: this.getUtils(prevstate[chart], prevstate.utils)
+      utils: this.getUtils(
+        [
+          ...prevstate[chart],
+          {
+            x:
+              prevstate[chart][prevstate[chart].length - 1].x +
+              prevstate.width / this.props.step,
+            y: value,
+            value: value
+          }
+        ],
+        prevstate.utils
+      )
     }));
   };
 
@@ -105,7 +117,6 @@ class Chart extends Component {
     } = this.props;
 
     const graph = this.getCoordinates(chart, height, utils);
-    console.log(graph);
     const ordinateAxis = { min: utils.min, moy: utils.moy, max: utils.max };
 
     const value = graph[graph.length - 1].value | 0;
