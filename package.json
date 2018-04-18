@@ -2,8 +2,12 @@
   "name": "gdax-trading",
   "version": "0.1.0",
   "author": "fabien Greard",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/FabienGreard/gdax-trading.git"
+  },
+  "license": "GPL-3.0",
   "dependencies": {
-    "chart.js": "^2.7.2",
     "express": "^4.16.3",
     "gdax": "^0.7.0",
     "react": "^16.3.1",
@@ -11,15 +15,15 @@
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.1.4",
-    "redux": "^3.7.2",
+    "redux": "4.0.0",
     "socket.io": "^2.1.0",
     "socket.io-client": "^2.1.0"
   },
   "devDependencies": {
     "enzyme": "^3.3.0",
+    "redux-devtools": "^3.4.1",
     "enzyme-adapter-react-16": "^1.1.1",
     "react-test-renderer": "^16.3.1",
-    "redux-devtools": "^3.4.1",
     "redux-test-utils": "^0.2.2"
   },
   "scripts": {
@@ -46,11 +50,5 @@
       "!<rootDir>/path/to/dir/"
     ]
   },
-  "keywords": [
-    "react",
-    "gdax",
-    "real-time",
-    "payments",
-    "trading"
-  ]
+  "keywords": ["react", "gdax", "real-time", "payments", "trading"]
 }
