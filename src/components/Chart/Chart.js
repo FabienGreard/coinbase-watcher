@@ -28,7 +28,7 @@ class Chart extends Component {
   }
 
   updateChart = () => {
-    this.update('chart', Math.round(Math.random() * 5000));
+    this.update('chart', Math.round(Math.random() * 100));
   };
 
   update = (chart, value) => {
@@ -84,7 +84,7 @@ class Chart extends Component {
         utils && utils.max > Math.ceil(Math.max.apply(null, array))
           ? utils.max
           : Math.ceil(Math.max.apply(null, array)),
-      moy: utils ? Math.round(utils.min + utils.max / 2) : 0
+      moy: utils ? utils.min + utils.max / 2 : 0
     };
   };
 
@@ -106,6 +106,7 @@ class Chart extends Component {
       identification,
       step,
       stepSecond,
+      showTrend,
       showPoint,
       showPath,
       showCoord,
@@ -144,7 +145,16 @@ class Chart extends Component {
               graph.map((coord, key) => (
                 <g className="graph" key={key}>
                   <path
-                    className="graph-path"
+                    className={
+                      'graph-path ' +
+                      (key - 1 >= 0 && showTrend
+                        ? graph[key - 1].value > coord.value
+                          ? 'graph-path-low'
+                          : graph[key - 1].value < coord.value
+                            ? 'graph-path-hight'
+                            : ''
+                        : '')
+                    }
                     d={
                       'M' +
                       graph[key - 1 >= 0 ? key - 1 : key].x +
@@ -193,7 +203,16 @@ class Chart extends Component {
               graph.map((coord, key) => (
                 <g className="graph" key={key}>
                   <line
-                    className="graph-line"
+                    className={
+                      'graph-line ' +
+                      (key - 1 >= 0 && showTrend
+                        ? graph[key - 1].value > coord.value
+                          ? 'graph-line-low'
+                          : graph[key - 1].value < coord.value
+                            ? 'graph-line-hight'
+                            : ''
+                        : '')
+                    }
                     style={{ strokeWidth: 2 + 5 / step }}
                     x1={graph[key - 1 >= 0 ? key - 1 : key].x}
                     y1={graph[key - 1 >= 0 ? key - 1 : key].y}
@@ -206,7 +225,16 @@ class Chart extends Component {
               graph.map((coord, key) => (
                 <g className="graph" key={key}>
                   <circle
-                    className="graph-point"
+                    className={
+                      'graph-point ' +
+                      (key - 1 >= 0 && showTrend
+                        ? graph[key - 1].value > coord.value
+                          ? 'graph-point-low'
+                          : graph[key - 1].value < coord.value
+                            ? 'graph-point-hight'
+                            : ''
+                        : '')
+                    }
                     style={{ r: 1 + 5 / step }}
                     cx={coord.x}
                     cy={coord.y}
@@ -274,6 +302,7 @@ Chart.propTypes = {
   stepSecond: PropTypes.number,
   width: PropTypes.number,
   height: PropTypes.number,
+  showTrend: PropTypes.bool,
   showPoint: PropTypes.bool,
   showCoord: PropTypes.bool,
   showLine: PropTypes.bool,
@@ -288,10 +317,11 @@ Chart.defaultProps = {
   data: [{ x: 0, y: 0, value: 0 }],
   title: '',
   identification: '',
-  step: 3,
+  step: 50,
   stepSecond: 1,
   width: 600,
   height: 400,
+  showTrend: false,
   showPoint: true,
   showCoord: false,
   showLine: true,

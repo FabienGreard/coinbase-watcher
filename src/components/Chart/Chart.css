@@ -62,16 +62,48 @@
   stroke-width: 2;
 }
 
+.graph-point-low {
+  fill: var(--gradiant-red-3);
+}
+
+.graph-point-hight {
+  fill: var(--gradiant-green-3);
+}
+
 .graph-line {
   stroke: var(--gradiant-3);
   stroke-width: 5;
+}
+
+.graph-line-low {
+  stroke: var(--gradiant-red-3);
+}
+
+.graph-line-hight {
+  stroke: var(--gradiant-green-3);
 }
 
 .graph-path {
   fill: var(--gradiant-1);
 }
 
+.graph-path-low {
+  fill: var(--gradiant-red-1);
+}
+
+.graph-path-hight {
+  fill: var(--gradiant-green-1);
+}
+
 .graph-path:hover {
   cursor: pointer;
   fill: var(--gradiant-2);
+}
+
+.graph-path-low:hover {
+  fill: var(--gradiant-red-2);
+}
+
+.graph-path-hight:hover {
+  fill: var(--gradiant-green-2);
 }
