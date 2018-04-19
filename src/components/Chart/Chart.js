@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-/* CSS */
-import './Chart.css';
-
 class Chart extends Component {
   constructor(props) {
     super(props);
     this.state = {
       interval: null,
+      getMouseY: { y: props.height, value: 0 },
+      toolTip: {},
       utils: this.getUtils(props.data, null),
       width: props.width,
       height: props.height,
@@ -99,22 +98,54 @@ class Chart extends Component {
     }));
   };
 
+  setToolTip = coord => {
+    this.setState({
+      toolTip: { value: coord.value, hover: coord.x }
+    });
+  };
+
+  setOrdonateIndicator = (e, utils, height) => {
+    const yRatio = (utils.max * 1.01 - utils.min * 0.99) / height;
+    const y =
+      e.clientY - e.target.parentNode.parentNode.getBoundingClientRect().y;
+    this.setState({
+      getMouseY: { y: y, value: Math.round((height - y) * yRatio) }
+    });
+  };
+
+  resetOrdonateIndicator = height => {
+    this.setState({
+      getMouseY: { y: height, value: 0 }
+    });
+  };
+
   render() {
-    const { chart, origin, width, height, utils } = this.state;
+    const {
+      chart,
+      origin,
+      width,
+      height,
+      utils,
+      toolTip,
+      getMouseY
+    } = this.state;
     const {
       title,
       identification,
       step,
       stepSecond,
       showTrend,
+      showToolTip,
       showPoint,
       showPath,
       showCoord,
       showLine,
+      showMouseY,
       showXGrid,
       showYGrid,
       showAbscissa,
-      showOrdinate
+      showOrdinate,
+      colors
     } = this.props;
 
     const graph = this.getCoordinates(chart, height, utils);
@@ -122,6 +153,10 @@ class Chart extends Component {
 
     const value = graph[graph.length - 1].value | 0;
     const date = new Date();
+
+    const setToolTip = this.setToolTip;
+    const setOrdonateIndicator = this.setOrdonateIndicator;
+    const resetOrdonateIndicator = this.resetOrdonateIndicator;
 
     return (
       <div>
@@ -131,19 +166,73 @@ class Chart extends Component {
         <div
           className="chart-container"
           style={{
+            display: 'grid',
             gridTemplateColumns: 'auto ' + width + 'px ',
-            gridTemplateRows: height + 'px auto'
+            gridTemplateRows: 'auto ' + height + 'px auto',
+            backgroundColor: colors.background
           }}>
+          {showToolTip && (
+            <div
+              className="tool-tip"
+              style={{
+                padding: 5,
+                backgroundColor: colors.background,
+                color: colors.text,
+                gridColumn: '2 / span 2',
+                gridRow: '1',
+                height: 20,
+                textAlign: 'end'
+              }}>
+              {toolTip.value && 'V : ' + toolTip.value}
+            </div>
+          )}
           <svg
             viewBox={origin.x + ' ' + origin.y + ' ' + width + ' ' + height}
             className="chart"
             style={{
               width: width,
-              height: height
-            }}>
+              height: height,
+              gridRow: '2 / span 2',
+              gridColumn: '2 / span 2'
+            }}
+            onMouseLeave={() => resetOrdonateIndicator(height)}>
             {showPath &&
               graph.map((coord, key) => (
-                <g className="graph" key={key}>
+                <g
+                  className="graph"
+                  style={{ cursor: 'pointer' }}
+                  key={key}
+                  onMouseEnter={e => setToolTip(coord)}
+                  onMouseLeave={() => setToolTip({ x: 0, value: 0 })}
+                  onMouseMove={e => setOrdonateIndicator(e, utils, height)}>
+                  <path
+                    className="graph-path-background"
+                    style={{
+                      fill:
+                        toolTip.hover !== coord.x
+                          ? colors.background
+                          : colors.backgroundHover
+                    }}
+                    d={
+                      'M' +
+                      graph[key - 1 >= 0 ? key - 1 : key].x + // 0,1
+                      ' ' +
+                      graph[key - 1 >= 0 ? key - 1 : key].y +
+                      ', L' +
+                      graph[key - 1 >= 0 ? key - 1 : key].x + // 0,0
+                      ' ' +
+                      0 +
+                      ', L' +
+                      coord.x + // 1,0
+                      ' ' +
+                      0 +
+                      ', L' +
+                      coord.x + // 1,1
+                      ' ' +
+                      coord.y +
+                      ' Z'
+                    }
+                  />
                   <path
                     className={
                       'graph-path ' +
@@ -155,6 +244,24 @@ class Chart extends Component {
                             : ''
                         : '')
                     }
+                    style={{
+                      fill:
+                        key - 1 >= 0 && showTrend
+                          ? graph[key - 1].value > coord.value
+                            ? toolTip.hover !== coord.x
+                              ? colors.pathLow
+                              : colors.pathLowHover
+                            : graph[key - 1].value < coord.value
+                              ? toolTip.hover !== coord.x
+                                ? colors.pathHight
+                                : colors.pathHightHover
+                              : toolTip.hover !== coord.x
+                                ? colors.path
+                                : colors.pathHover
+                          : toolTip.hover !== coord.x
+                            ? colors.path
+                            : colors.pathHover
+                    }}
                     d={
                       'M' +
                       graph[key - 1 >= 0 ? key - 1 : key].x +
@@ -177,31 +284,15 @@ class Chart extends Component {
                   />
                 </g>
               ))}
-            {showXGrid && (
-              <g className="grid">
-                <line
-                  className="x-grid"
-                  x1={origin.x}
-                  y1={origin.y}
-                  x2={origin.x}
-                  y2={origin.y + height}
-                />
-              </g>
-            )}
-            {showYGrid && (
-              <g className="grid">
-                <line
-                  className="y-grid"
-                  x1={origin.x}
-                  y1={origin.y + height}
-                  x2={origin.x + width}
-                  y2={origin.y + height}
-                />
-              </g>
-            )}
             {showLine &&
               graph.map((coord, key) => (
-                <g className="graph" key={key}>
+                <g
+                  className="graph"
+                  onMouseEnter={() => setToolTip(coord)}
+                  onMouseLeave={() => setToolTip({ x: 0, value: 0 })}
+                  onMouseMove={e => setOrdonateIndicator(e, utils, height)}
+                  style={{ cursor: 'pointer' }}
+                  key={key}>
                   <line
                     className={
                       'graph-line ' +
@@ -213,7 +304,17 @@ class Chart extends Component {
                             : ''
                         : '')
                     }
-                    style={{ strokeWidth: 2 + 5 / step }}
+                    style={{
+                      strokeWidth: 2 + 5 / step,
+                      stroke:
+                        key - 1 >= 0 && showTrend
+                          ? graph[key - 1].value > coord.value
+                            ? colors.lineLow
+                            : graph[key - 1].value < coord.value
+                              ? colors.lineHight
+                              : colors.line
+                          : colors.line
+                    }}
                     x1={graph[key - 1 >= 0 ? key - 1 : key].x}
                     y1={graph[key - 1 >= 0 ? key - 1 : key].y}
                     x2={coord.x}
@@ -223,7 +324,13 @@ class Chart extends Component {
               ))}
             {showPoint &&
               graph.map((coord, key) => (
-                <g className="graph" key={key}>
+                <g
+                  className="graph"
+                  onMouseEnter={() => setToolTip(coord)}
+                  onMouseLeave={() => setToolTip({ x: 0, value: 0 })}
+                  onMouseMove={e => setOrdonateIndicator(e, utils, height)}
+                  style={{ cursor: 'pointer' }}
+                  key={key}>
                   <circle
                     className={
                       'graph-point ' +
@@ -235,7 +342,26 @@ class Chart extends Component {
                             : ''
                         : '')
                     }
-                    style={{ r: 1 + 5 / step }}
+                    style={{
+                      r: 1 + 5 / step,
+                      stroke:
+                        key - 1 >= 0 && showTrend
+                          ? graph[key - 1].value > coord.value
+                            ? colors.pointLow
+                            : graph[key - 1].value < coord.value
+                              ? colors.pointHight
+                              : colors.point
+                          : colors.point,
+                      fill:
+                        key - 1 >= 0 && showTrend
+                          ? graph[key - 1].value > coord.value
+                            ? colors.lineLow
+                            : graph[key - 1].value < coord.value
+                              ? colors.lineHight
+                              : colors.line
+                          : colors.line,
+                      strokeWidth: 2
+                    }}
                     cx={coord.x}
                     cy={coord.y}
                     data-value={coord.x}
@@ -244,22 +370,87 @@ class Chart extends Component {
               ))}
             {showCoord &&
               graph.map((coord, key) => (
-                <g className="graph" key={key}>
+                <g
+                  className="graph"
+                  onMouseEnter={() => setToolTip(coord)}
+                  onMouseLeave={() => setToolTip({ x: 0, value: 0 })}
+                  onMouseMove={e => setOrdonateIndicator(e, utils, height)}
+                  key={key}
+                  style={{ cursor: 'pointer' }}>
                   <text
                     className="graph-text"
-                    style={{ 'font-size': 12 + 4 / step }}
+                    style={{
+                      fontSize: 12 + 4 / step,
+                      fill: colors.textInside,
+                      textAnchor: 'middle'
+                    }}
                     x={coord.x - width / step / 2}
                     y={origin.y + height - 10}>
                     {coord.value}
                   </text>
                 </g>
               ))}
+            {showMouseY && (
+              <g
+                className="grid"
+                style={{
+                  strokeDasharray: '5',
+                  strokeWidth: '1'
+                }}>
+                <line
+                  className="mouse-y-grid"
+                  style={{ stroke: colors.grid }}
+                  x1={origin.x}
+                  y1={origin.y + getMouseY.y}
+                  x2={origin.x + width}
+                  y2={origin.y + getMouseY.y}
+                />
+              </g>
+            )}
+            {showXGrid && (
+              <g
+                className="grid"
+                style={{
+                  strokeDasharray: '5',
+                  strokeWidth: '1'
+                }}>
+                <line
+                  className="x-grid"
+                  style={{ stroke: colors.grid }}
+                  x1={origin.x}
+                  y1={origin.y}
+                  x2={origin.x}
+                  y2={origin.y + height}
+                />
+              </g>
+            )}
+            {showYGrid && (
+              <g
+                className="grid"
+                style={{
+                  strokeDasharray: '5',
+                  strokeWidth: '1'
+                }}>
+                <line
+                  className="y-grid"
+                  style={{ stroke: colors.grid }}
+                  x1={origin.x}
+                  y1={origin.y + height}
+                  x2={origin.x + width}
+                  y2={origin.y + height}
+                />
+              </g>
+            )}
           </svg>
-
           {showAbscissa && (
             <div
               className="abscissa"
               style={{
+                display: 'flex',
+                flexDirection: 'row-reverse',
+                justifyContent: 'space-between',
+                gridColumn: '2 / span 2',
+                gridRow: '3',
                 width:
                   (graph.length > step ? graph.length - 1 : graph.length - 2) *
                   width /
@@ -269,7 +460,10 @@ class Chart extends Component {
                 Array(Math.floor((graph.length - 1) * (width / step) / 100)),
                 (v, i) => i * (step / width) * 100
               ).map((value, i) => (
-                <span className="abscissa-span" key={i}>
+                <span
+                  className="abscissa-span"
+                  key={i}
+                  style={{ color: colors.text }}>
                   {new Date(
                     date.getTime() - value * stepSecond * 1000
                   ).getHours()}:{new Date(
@@ -280,12 +474,41 @@ class Chart extends Component {
             </div>
           )}
           {showOrdinate && (
-            <div className="ordinate">
+            <div
+              className="ordinate"
+              style={{
+                display: 'flex',
+                position: 'relative',
+                flexDirection: 'column-reverse',
+                justifyContent: 'space-between',
+                alignItems: 'flex-end',
+                gridRow: '2 / 2'
+              }}>
               {Object.values(ordinateAxis).map((ordinate, index) => (
-                <span className="ordinate-span" key={index}>
+                <span
+                  className="ordinate-span"
+                  key={index}
+                  style={{
+                    color: colors.text,
+                    marginRight: '2px',
+                    textAlign: 'end',
+                    minWidth: '30px'
+                  }}>
                   {ordinate} {identification}
                 </span>
               ))}
+              {showMouseY && (
+                <span
+                  className="abscissa-mouse-y"
+                  style={{
+                    position: 'absolute',
+                    top: getMouseY.y,
+                    right: 2,
+                    marginbottom: '2px'
+                  }}>
+                  {getMouseY.value}
+                </span>
+              )}
             </div>
           )}
         </div>
@@ -303,33 +526,57 @@ Chart.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
   showTrend: PropTypes.bool,
+  showToolTip: PropTypes.bool,
   showPoint: PropTypes.bool,
   showCoord: PropTypes.bool,
   showLine: PropTypes.bool,
   showPath: PropTypes.bool,
+  showMouseY: PropTypes.bool,
   showXGrid: PropTypes.bool,
   showYGrid: PropTypes.bool,
   showAbscissa: PropTypes.bool,
-  showOrdinate: PropTypes.bool
+  showOrdinate: PropTypes.bool,
+  colors: PropTypes.object
 };
 
 Chart.defaultProps = {
   data: [{ x: 0, y: 0, value: 0 }],
   title: '',
   identification: '',
-  step: 50,
+  step: 20,
   stepSecond: 1,
   width: 600,
   height: 400,
-  showTrend: false,
+  showTrend: true,
+  showToolTip: true,
   showPoint: true,
-  showCoord: false,
+  showCoord: true,
   showLine: true,
   showPath: true,
+  showMouseY: true,
   showXGrid: true,
   showYGrid: true,
   showAbscissa: true,
-  showOrdinate: true
+  showOrdinate: true,
+  colors: {
+    background: 'transparent',
+    textInside: '#fff',
+    text: '#00171F',
+    grid: '#00171F',
+    point: '#fff',
+    line: '#1E97BF',
+    path: '#8FCFE8',
+    backgroundHover: '#F5F5F5',
+    pathHover: '#6BB2CE',
+    pathLowHover: '#CC1A49',
+    pathHightHover: '#9CD6A7',
+    lineLow: '#CC0036',
+    lineHight: '#71D685',
+    pointLow: 'fff',
+    pointHight: '#fff',
+    pathLow: '#E63462',
+    pathHight: '#C7EFCF'
+  }
 };
 
 export { Chart };
