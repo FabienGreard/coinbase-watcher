@@ -497,18 +497,22 @@ class Chart extends Component {
                   {ordinate} {identification}
                 </span>
               ))}
-              {showMouseY && (
-                <span
-                  className="abscissa-mouse-y"
-                  style={{
-                    position: 'absolute',
-                    top: getMouseY.y,
-                    right: 2,
-                    marginbottom: '2px'
-                  }}>
-                  {getMouseY.value}
-                </span>
-              )}
+              {showMouseY &&
+                getMouseY.y !== height && (
+                  <span
+                    className="abscissa-mouse-y"
+                    style={{
+                      position: 'absolute',
+                      top: getMouseY.y - 10,
+                      right: 2,
+                      backgroundColor: colors.background,
+                      width: '100%',
+                      border: '1px solid ' + colors.text,
+                      textAlign: 'end'
+                    }}>
+                    {getMouseY.value}
+                  </span>
+                )}
             </div>
           )}
         </div>
@@ -559,7 +563,7 @@ Chart.defaultProps = {
   showAbscissa: true,
   showOrdinate: true,
   colors: {
-    background: 'transparent',
+    background: '#fff',
     textInside: '#fff',
     text: '#00171F',
     grid: '#00171F',
