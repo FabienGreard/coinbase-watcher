@@ -197,9 +197,7 @@ class Chart extends Component {
               gridColumn: '2 / span 2',
               cursor: 'pointer',
               zIndex: 1
-            }}
-            onMouseMove={e => setOrdonateIndicator(e, utils, height)}
-            onMouseLeave={() => resetOrdonateIndicator(height)}>
+            }}>
             {showPath &&
               graph.map((coord, key) => (
                 <g
@@ -441,6 +439,41 @@ class Chart extends Component {
                 />
               </g>
             )}
+            <g
+              className="graph"
+              style={{ cursor: 'pointer' }}
+              onMouseMove={e => setOrdonateIndicator(e, utils, height)}
+              onMouseLeave={() => resetOrdonateIndicator(height)}>
+              <path
+                className="graph-event"
+                style={{
+                  fill: 'transparent'
+                }}
+                d={
+                  'M' +
+                  0 + // 0,1
+                  ' ' +
+                  origin.y +
+                  height +
+                  ', L' +
+                  0 + // 0,0
+                  ' ' +
+                  0 +
+                  ', L' +
+                  origin.x +
+                  width + // 1,0
+                  ' ' +
+                  0 +
+                  ', L' +
+                  origin.x +
+                  width + // 1,1
+                  ' ' +
+                  origin.y +
+                  height +
+                  ' Z'
+                }
+              />
+            </g>
           </svg>
           {showAbscissa && (
             <div
