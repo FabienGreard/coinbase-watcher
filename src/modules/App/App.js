@@ -28,13 +28,24 @@ class App extends React.Component {
     });
   }
 
+  getProductHistorcRates = () => {
+    return Math.round(Math.random() * 10);
+  };
+
   render() {
     const { alert } = this.props;
+
+    const getProductHistorcRates = this.getProductHistorcRates;
+
     return (
       <div>
         <Alert alert={alert} />
         <div className="charts">
-          <Chart title={'Line chart'} data={[{ x: 0, y: 0, value: 0 }]} />
+          <Chart
+            title={'Line chart'}
+            data={[{ x: 0, y: 0, value: 0 }]}
+            liveData={getProductHistorcRates}
+          />
         </div>
         <ul>
           <li>

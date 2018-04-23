@@ -17,9 +17,11 @@ class Chart extends Component {
   }
 
   componentDidMount() {
-    this.setState({
-      interval: setInterval(this.updateChart, this.props.stepSecond * 1000)
-    });
+    if (this.props.isDataLive) {
+      this.setState({
+        interval: setInterval(this.updateChart, this.props.stepSecond * 1000)
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -27,7 +29,7 @@ class Chart extends Component {
   }
 
   updateChart = () => {
-    this.update('chart', Math.round(Math.random() * 100));
+    this.update('chart', this.props.liveData());
   };
 
   update = (chart, value) => {
@@ -106,8 +108,7 @@ class Chart extends Component {
 
   setOrdonateIndicator = (e, utils, height) => {
     const yRatio = (utils.max * 1.01 - utils.min * 0.99) / height;
-    const y =
-      e.clientY - e.target.parentNode.parentNode.getBoundingClientRect().y;
+    const y = e.clientY - e.target.getBoundingClientRect().y;
     this.setState({
       getMouseY: { y: y, value: Math.round((height - y) * yRatio) }
     });
@@ -193,8 +194,11 @@ class Chart extends Component {
               width: width,
               height: height,
               gridRow: '2 / span 2',
-              gridColumn: '2 / span 2'
+              gridColumn: '2 / span 2',
+              cursor: 'pointer',
+              zIndex: 1
             }}
+            onMouseMove={e => setOrdonateIndicator(e, utils, height)}
             onMouseLeave={() => resetOrdonateIndicator(height)}>
             {showPath &&
               graph.map((coord, key) => (
@@ -203,8 +207,7 @@ class Chart extends Component {
                   style={{ cursor: 'pointer' }}
                   key={key}
                   onMouseEnter={e => setToolTip(coord)}
-                  onMouseLeave={() => setToolTip({ x: 0, value: 0 })}
-                  onMouseMove={e => setOrdonateIndicator(e, utils, height)}>
+                  onMouseLeave={() => setToolTip({ x: 0, value: 0 })}>
                   <path
                     className="graph-path-background"
                     style={{
@@ -290,7 +293,6 @@ class Chart extends Component {
                   className="graph"
                   onMouseEnter={() => setToolTip(coord)}
                   onMouseLeave={() => setToolTip({ x: 0, value: 0 })}
-                  onMouseMove={e => setOrdonateIndicator(e, utils, height)}
                   style={{ cursor: 'pointer' }}
                   key={key}>
                   <line
@@ -328,7 +330,6 @@ class Chart extends Component {
                   className="graph"
                   onMouseEnter={() => setToolTip(coord)}
                   onMouseLeave={() => setToolTip({ x: 0, value: 0 })}
-                  onMouseMove={e => setOrdonateIndicator(e, utils, height)}
                   style={{ cursor: 'pointer' }}
                   key={key}>
                   <circle
@@ -374,7 +375,6 @@ class Chart extends Component {
                   className="graph"
                   onMouseEnter={() => setToolTip(coord)}
                   onMouseLeave={() => setToolTip({ x: 0, value: 0 })}
-                  onMouseMove={e => setOrdonateIndicator(e, utils, height)}
                   key={key}
                   style={{ cursor: 'pointer' }}>
                   <text
@@ -523,6 +523,8 @@ class Chart extends Component {
 
 Chart.propTypes = {
   data: PropTypes.array,
+  liveData: PropTypes.func,
+  isDataLive: PropTypes.bool,
   title: PropTypes.string,
   identification: PropTypes.string,
   step: PropTypes.number,
@@ -545,18 +547,20 @@ Chart.propTypes = {
 
 Chart.defaultProps = {
   data: [{ x: 0, y: 0, value: 0 }],
+  isDataLive: true,
+  liveData: () => Math.round(Math.random() * 100),
   title: '',
   identification: '',
   step: 20,
   stepSecond: 1,
   width: 600,
   height: 400,
-  showTrend: true,
-  showToolTip: true,
+  showTrend: false,
+  showToolTip: false,
   showPoint: true,
-  showCoord: true,
+  showCoord: false,
   showLine: true,
-  showPath: true,
+  showPath: false,
   showMouseY: true,
   showXGrid: true,
   showYGrid: true,
