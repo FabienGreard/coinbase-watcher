@@ -7,7 +7,7 @@ import { Route, Switch, Link, Redirect } from 'react-router-dom';
 import { alertActions } from '../../_actions';
 
 /* SERVICES */
-// import { gdaxService } from '../../_services';
+import { gdaxService } from '../../_services';
 
 /* HELPERS */
 import { history, keys } from '../../helpers';
@@ -27,6 +27,11 @@ class App extends React.Component {
       props.dispatch(alertActions.clear());
     });
   }
+
+  componentDidMount = async () => {
+    const data = await gdaxService.getProductHistoricRates('ETH-EUR', 60);
+    console.log(data);
+  };
 
   getProductHistorcRates = () => {
     return Math.round(Math.random() * 10);
