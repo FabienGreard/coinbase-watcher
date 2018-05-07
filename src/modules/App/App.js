@@ -10,7 +10,7 @@ import { alertActions } from '../../_actions';
 import { gdaxService } from '../../_services';
 
 /* HELPERS */
-import { history, keys, url } from '../../helpers';
+import { history, keys, restUrls } from '../../helpers';
 
 /* COMPONENTS */
 import { Alert, Chart, Gdax } from '../../components';

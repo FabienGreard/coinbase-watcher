@@ -1,8 +1,8 @@
-import { url } from '../helpers';
+import { restUrls } from '../helpers';
 
 const headers = { 'Content-Type': 'application/json' };
 
-const getProducts = async (endpoint = url.sandboxeRest) => {
+const getProducts = async (endpoint = restUrls.sandbox) => {
   const requestOptions = {
     method: 'GET',
     headers: headers
@@ -17,7 +17,7 @@ const getProducts = async (endpoint = url.sandboxeRest) => {
 };
 
 const getProductOrderBook = async (
-  endpoint = url.sandboxeRest,
+  endpoint = restUrls.sandbox,
   id = 'ETH-EUR',
   level = 1
 ) => {
@@ -38,7 +38,7 @@ const getProductOrderBook = async (
 };
 
 const getProductTicker = async (
-  endpoint = url.sandboxeRest,
+  endpoint = restUrls.sandbox,
   id = 'ETH-EUR'
 ) => {
   const requestOptions = {
@@ -57,7 +57,7 @@ const getProductTicker = async (
   }
 };
 
-const getTrades = async (endpoint = url.sandboxeRest, id = 'ETH-EUR') => {
+const getTrades = async (endpoint = restUrls.sandbox, id = 'ETH-EUR') => {
   const requestOptions = {
     method: 'GET',
     headers: headers
@@ -75,7 +75,7 @@ const getTrades = async (endpoint = url.sandboxeRest, id = 'ETH-EUR') => {
 };
 
 const getHistoricRates = async (
-  endpoint = url.sandboxeRest,
+  endpoint = restUrls.sandbox,
   id = 'ETH-EUR',
   granularity = 3600
 ) => {
@@ -89,7 +89,7 @@ const getHistoricRates = async (
   }
 };
 
-const get24hrStats = async (endpoint = url.sandboxeRest, id = 'ETH-EUR') => {
+const get24hrStats = async (endpoint = restUrls.sandbox, id = 'ETH-EUR') => {
   try {
     const response = await fetch(endpoint + '/products/' + id + '/stats');
     return response.json();
@@ -98,7 +98,7 @@ const get24hrStats = async (endpoint = url.sandboxeRest, id = 'ETH-EUR') => {
   }
 };
 
-const getCurrencies = async (endpoint = url.sandboxeRest) => {
+const getCurrencies = async (endpoint = restUrls.sandbox) => {
   try {
     const response = await fetch(endpoint + '/currencies');
     return response.json();
@@ -107,7 +107,7 @@ const getCurrencies = async (endpoint = url.sandboxeRest) => {
   }
 };
 
-const getTime = async (endpoint = url.sandboxeRest) => {
+const getTime = async (endpoint = restUrls.sandbox) => {
   try {
     const response = await fetch(endpoint + '/time');
     return response.json();
