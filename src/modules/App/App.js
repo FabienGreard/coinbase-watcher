@@ -10,7 +10,7 @@ import { alertActions } from '../../_actions';
 import { gdaxService } from '../../_services';
 
 /* HELPERS */
-import { history, keys } from '../../helpers';
+import { history, keys, url } from '../../helpers';
 
 /* COMPONENTS */
 import { Alert, Chart, Gdax } from '../../components';
@@ -29,7 +29,11 @@ class App extends React.Component {
   }
 
   componentDidMount = async () => {
-    const data = await gdaxService.getProductHistoricRates('ETH-EUR', 60);
+    const data = await gdaxService.getProductHistoricRates(
+      url.liveRest,
+      'ETH-EUR',
+      60
+    );
     console.log(data);
   };
 

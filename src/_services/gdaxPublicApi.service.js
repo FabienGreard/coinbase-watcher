@@ -1,18 +1,21 @@
 import { url } from '../helpers';
 import Gdax from 'gdax';
 
-const getPublicClient = (endpoint = url.sandboxeRest) => {
+const getPublicClient = endpoint => {
   return new Gdax.PublicClient(endpoint);
 };
 
 const getProductHistoricRates = async (
+  endpoint = url.sandboxeRest,
   currency = 'ETH-EUR',
-  granularity = { granularity: 3600 }
+  granularity = 3600
 ) => {
   try {
-    const response = await getPublicClient().getProductHistoricRates(
+    const response = await getPublicClient(endpoint).getProductHistoricRates(
       currency,
-      granularity
+      {
+        granularity: granularity
+      }
     );
 
     return response;
