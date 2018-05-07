@@ -38,7 +38,6 @@
       "src/**/*.{js,jsx}",
       "!src/keys.{js,jsx}",
       "!src/index.{js,jsx}",
-      "!src/_services/*.{js,jsx}",
       "!src/_constants/*.{js,jsx}",
       "!src/_reducers/*.{js,jsx}",
       "!src/registerServiceWorker.{js,jsx}",

@@ -1,13 +1,12 @@
-import { restUrls } from '../helpers';
+import { headers, restUrls } from '../helpers';
 
-const headers = { 'Content-Type': 'application/json' };
+const requestOptions = {
+  method: 'GET',
+  headers: new headers()
+};
 
 const getProducts = async (endpoint = restUrls.sandbox) => {
-  const requestOptions = {
-    method: 'GET',
-    headers: headers
-  };
-
+  console.log(requestOptions);
   try {
     const response = await fetch(endpoint + '/products', requestOptions);
     return response.json();
@@ -21,11 +20,6 @@ const getProductOrderBook = async (
   id = 'ETH-EUR',
   level = 1
 ) => {
-  const requestOptions = {
-    method: 'GET',
-    headers: headers
-  };
-
   try {
     const response = await fetch(
       endpoint + '/products/' + id + '/book?level=' + level,
@@ -41,11 +35,6 @@ const getProductTicker = async (
   endpoint = restUrls.sandbox,
   id = 'ETH-EUR'
 ) => {
-  const requestOptions = {
-    method: 'GET',
-    headers: headers
-  };
-
   try {
     const response = await fetch(
       endpoint + '/products/' + id + '/ticker',
@@ -58,11 +47,6 @@ const getProductTicker = async (
 };
 
 const getTrades = async (endpoint = restUrls.sandbox, id = 'ETH-EUR') => {
-  const requestOptions = {
-    method: 'GET',
-    headers: headers
-  };
-
   try {
     const response = await fetch(
       endpoint + '/products/' + id + '/trades',
@@ -81,7 +65,8 @@ const getHistoricRates = async (
 ) => {
   try {
     const response = await fetch(
-      endpoint + '/products/' + id + '/candles?granularity=' + granularity
+      endpoint + '/products/' + id + '/candles?granularity=' + granularity,
+      requestOptions
     );
     return response.json();
   } catch (e) {
@@ -91,7 +76,10 @@ const getHistoricRates = async (
 
 const get24hrStats = async (endpoint = restUrls.sandbox, id = 'ETH-EUR') => {
   try {
-    const response = await fetch(endpoint + '/products/' + id + '/stats');
+    const response = await fetch(
+      endpoint + '/products/' + id + '/stats',
+      requestOptions
+    );
     return response.json();
   } catch (e) {
     return e;
@@ -100,7 +88,7 @@ const get24hrStats = async (endpoint = restUrls.sandbox, id = 'ETH-EUR') => {
 
 const getCurrencies = async (endpoint = restUrls.sandbox) => {
   try {
-    const response = await fetch(endpoint + '/currencies');
+    const response = await fetch(endpoint + '/currencies', requestOptions);
     return response.json();
   } catch (e) {
     return e;
@@ -109,14 +97,14 @@ const getCurrencies = async (endpoint = restUrls.sandbox) => {
 
 const getTime = async (endpoint = restUrls.sandbox) => {
   try {
-    const response = await fetch(endpoint + '/time');
+    const response = await fetch(endpoint + '/time', requestOptions);
     return response.json();
   } catch (e) {
     return e;
   }
 };
 
-export const gdaxService = {
+export const gdaxPublicApiService = {
   getProducts,
   getProductOrderBook,
   getProductTicker,

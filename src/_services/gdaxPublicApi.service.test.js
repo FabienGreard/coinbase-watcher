@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { gdaxService } from './';
+import { gdaxPublicApiService } from './';
 import { restUrls } from '../helpers';
 
 describe('gdaxPublicApiService', () => {
   for (let url in restUrls) {
     it('getProducts:' + url, async () => {
-      const data = await gdaxService.getProducts(restUrls[url]);
+      const data = await gdaxPublicApiService.getProducts(restUrls[url]);
       expect(data).toContainEqual(
         expect.objectContaining({
           id: expect.any(String),
@@ -27,7 +27,9 @@ describe('gdaxPublicApiService', () => {
       );
     });
     it('getProductOrderBook:' + url, async () => {
-      const data = await gdaxService.getProductOrderBook(restUrls[url]);
+      const data = await gdaxPublicApiService.getProductOrderBook(
+        restUrls[url]
+      );
       expect(data).toEqual(
         expect.objectContaining({
           sequence: expect.any(Number),
@@ -37,7 +39,7 @@ describe('gdaxPublicApiService', () => {
       );
     });
     it('getProductTicker:' + url, async () => {
-      const data = await gdaxService.getProductTicker(restUrls[url]);
+      const data = await gdaxPublicApiService.getProductTicker(restUrls[url]);
       expect(data).toEqual(
         expect.objectContaining({
           trade_id: expect.any(Number),
@@ -51,7 +53,7 @@ describe('gdaxPublicApiService', () => {
       );
     });
     it('getTrades:' + url, async () => {
-      const data = await gdaxService.getTrades(restUrls[url]);
+      const data = await gdaxPublicApiService.getTrades(restUrls[url]);
       expect(data).toContainEqual(
         expect.objectContaining({
           time: expect.any(String),
@@ -63,11 +65,11 @@ describe('gdaxPublicApiService', () => {
       );
     });
     it('getHistoricRates:' + url, async () => {
-      const data = await gdaxService.getHistoricRates(restUrls[url]);
+      const data = await gdaxPublicApiService.getHistoricRates(restUrls[url]);
       expect(data).toEqual(expect.any(Array));
     });
     it('get24hrStats:' + url, async () => {
-      const data = await gdaxService.get24hrStats(restUrls[url]);
+      const data = await gdaxPublicApiService.get24hrStats(restUrls[url]);
       expect(data).toEqual(
         expect.objectContaining({
           open: expect.anything(),
@@ -80,7 +82,7 @@ describe('gdaxPublicApiService', () => {
       );
     });
     it('getCurrencies:' + url, async () => {
-      const data = await gdaxService.getCurrencies(restUrls[url]);
+      const data = await gdaxPublicApiService.getCurrencies(restUrls[url]);
       expect(data).toContainEqual(
         expect.objectContaining({
           id: expect.any(String),
@@ -92,7 +94,7 @@ describe('gdaxPublicApiService', () => {
       );
     });
     it('getTime:' + url, async () => {
-      const data = await gdaxService.getTime(restUrls[url]);
+      const data = await gdaxPublicApiService.getTime(restUrls[url]);
       expect(data).toEqual(
         expect.objectContaining({
           iso: expect.any(String),
