@@ -28,14 +28,7 @@ class App extends React.Component {
     });
   }
 
-  componentDidMount = async () => {
-    const data = await gdaxService.getProductHistoricRates(
-      url.liveRest,
-      'ETH-EUR',
-      60
-    );
-    console.log(data);
-  };
+  componentDidMount = async () => {};
 
   getProductHistorcRates = () => {
     return Math.round(Math.random() * 10);
