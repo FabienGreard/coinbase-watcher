@@ -6,7 +6,6 @@ const requestOptions = {
 };
 
 const getProducts = async (endpoint = restUrls.sandbox) => {
-  console.log(requestOptions);
   try {
     const response = await fetch(endpoint + '/products', requestOptions);
     return response.json();
